@@ -25,14 +25,6 @@ if (fs.existsSync(file)) {
 } else {
 	db = new sqlite3.Database(file);
 	console.log('SteamDB database was create.');
-	db.run('CREATE TABLE DateTimeOut(name INTEGER)', function(){
-		console.log('TABLE DateTimeOut was create.');
-		var i = 0;
-		while(i<accountCount){
-			i++;
-			db.run('INSERT INTO DateTimeOut(name) VALUES(?)', [i]);
-		}
-	});
 	db.run('CREATE TABLE Accounts(countAcc INTEGER)', function(){
 		console.log('TABLE Accounts was create.');
 		db.run('INSERT INTO Accounts(countAcc) VALUES(?)', [0], function(err){
@@ -40,18 +32,6 @@ if (fs.existsSync(file)) {
 				console.log(err.message);
 			else
 				console.log('Insert was ended.');
-		});
-	});
-}
-
-function selectCountAcc(){
-	let sql = 'SELECT countAcc FROM Accounts';
-	db.all(sql, [], function(err, rows) {
-		if (err)
-			throw err;
-		rows.forEach(function(row) {
-			countAcc = row.countAcc;
-			console.log('Count: ' + (countAcc+1));
 		});
 	});
 }
@@ -176,7 +156,7 @@ function onDocumentAddBot(msg){
 	});
 }
 
-function writeFile(msg, line){
+function writeFile(line){
 	var fields = line.split(':');
 	let configurate = {  
 		username: fields[0],
@@ -187,14 +167,8 @@ function writeFile(msg, line){
 	fs.writeFileSync('config' + countAcc + '.json', JSON.stringify(configurate), function(err) {  
 		if (err) throw err;
 	});
-	let sql = 'UPDATE Accounts SET countAcc = ' + countAcc;
-	db.run(sql, function(err) {
-	if (err)
-		return console.error(err.message);
-	console.log(`Row(s) updated: ${this.changes}`);
-	});
 	console.log('Account added: username ' + fields[0] + 'pass ' + fields[1]);
-	bot.sendMessage(msg,'Bot with username -' + fields[0]);
+	bot.sendMessage(settings.chatID,'Bot with username -' + fields[0]);
 }
 
 // Steam Connections
@@ -217,7 +191,7 @@ function connectSteamClient(msg, username, pass, sharedSecret, guard, i) {
 	client.on('steamGuard', function(domain, callback){
 		if(sharedSecret == '1' && guard == undefined){
 			console.log('Enter Guard:');
-			bot.sendMessage(msg.chat.id,'\u{1F4AB} Enter Guard:');
+			bot.sendMessage(settings.chatID,'\u{1F4AB} Enter Guard:');
 			bot.once('message', function(msg){
 				connectSteamClient(msg, connect.username, connect.password, connect.sharedSecret, msg.text);
 			});
@@ -272,7 +246,7 @@ function addFriends(msg, i){
 			var p = 0;
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
 			for( p; p < 30; p++){
-				addFriendsSleep(msg, allID[(30*(i-1))+p], p);
+				addFriendsSleep(msg, allID[(30*(i-1))+p]);
 			}
 			bot.sendMessage(settings.chatID, 'Added friends: ' + p);
 			loggoutSteamClient(msg, i);
@@ -290,6 +264,7 @@ function addFriendsSleep(msg, line){
 				exceptionAddFriends(msg, err);
 			}else{
 				console.log('Friend added with id ', line);
+				bot.sendMessage(settings.chatID, 'Friend added with id ', line);
 			}
 		});
 	}
@@ -299,13 +274,13 @@ function addFriendsSleep(msg, line){
 function exceptionAddFriends(msg, err){
 	if(String(err) == 'Error: DuplicateName'){
 		console.log('Already friends or pending confirmation');
-		//bot.sendMessage(settings.chatID, 'Already friends or pending confirmation');
+		bot.sendMessage(settings.chatID, 'Already friends or pending confirmation');
 	}else if(String(err) == 'Error: Ignored'){
 		console.log('You are ignored');
-		//bot.sendMessage(settings.chatID, 'You are ignored');
+		bot.sendMessage(settings.chatID, 'You are ignored');
 	}else if(String(err) == 'Error: Blocked'){
 		console.log('You are blocked');
-		//bot.sendMessage(settings.chatID, 'You are blocked');
+		bot.sendMessage(settings.chatID, 'You are blocked');
 	}else{
 		console.log(String(err));
 		bot.sendMessage(settings.chatID, 'Steam ' + String(err));
