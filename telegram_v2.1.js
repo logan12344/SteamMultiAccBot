@@ -38,9 +38,8 @@ bot.onText(/\/go/, async function(msg) { // Go
 	requireJSON();
 	if(configArray != {})
 		addDeleteSpam(msg);
-	else{
+	else
 		console.log('Use /bot');
-	}
 });
 
 bot.onText(/\/bot/, async function(msg) { // Bot
@@ -88,9 +87,9 @@ async function fillTheArrayOfMessages(msg){
 	messagesForSend[countOfFillArr] = msg.text;
 	console.log('messagesForSend['+countOfFillArr+'] = ' + messagesForSend[countOfFillArr]);
 	countOfFillArr++;
-	if(countOfFillArr == countMess){
+	if(countOfFillArr == countMess)
 		temp(msg);
-	}else{
+	else{
 		await bot.sendMessage(settings.chatID, '\u{270F} Введите сообщение номер '+ (countOfFillArr+1) +': ');
 		bot.once('message', fillTheArrayOfMessages);
 	}
@@ -126,9 +125,9 @@ function onDocumentAddBot(msg){
 			console.log(allID.length);
 			var p = 0;
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
-			for( p; p < allID.length; p++){
+			for( p; p < allID.length; p++)
 				writeFile(allID[p], p);
-			}
+			
 		});
 	});
 }
@@ -144,7 +143,7 @@ function writeFile(line, p){
 		if (err) throw err;
 	});
 	console.log('Account added: username ' + fields[0] + 'pass ' + fields[1]);
-	bot.sendMessage(settings.chatID,'Bot with username -' + fields[0]);
+	bot.sendMessage(settings.chatID,'Bot with username: ' + fields[0]);
 }
 
 // Steam Connections
@@ -156,7 +155,7 @@ function connectSteamClient(msg, username, pass, sharedSecret, guard, i) {
 		"password": pass
 	});
 	
-	client.on('error', async function(e) {
+	client.on('error', function(e) {
 		if(e){
 			console.log(String(e));
 			client = undefined;
@@ -171,25 +170,21 @@ function connectSteamClient(msg, username, pass, sharedSecret, guard, i) {
 			bot.once('message', function(msg){
 				connectSteamClient(msg, connect.username, connect.password, connect.sharedSecret, msg.text);
 			});
-		}else if(sharedSecret == '1' && guard != undefined){
+		}else if(sharedSecret == '1' && guard != undefined)
 			callback(guard);
-		}else{
+		else
 			callback(SteamTotp.generateAuthCode(sharedSecret));
-		}
 	});
 
-	client.on('loggedOn', async function() {
+	client.on('loggedOn', function() {
 		console.log('Logged into Steam ' + connect.username);
-		await bot.sendMessage(settings.chatID,'\u{2705}'+ i +' Logged into Steam ' + connect.username);
-		if(addFriends1){
+		bot.sendMessage(settings.chatID,'\u{2705}'+ i +' Logged into Steam ' + connect.username);
+		if(addFriends1)
 			addFriends(msg, i);			
-		}
-		if(deleteRequestFriends1){
+		if(deleteRequestFriends1)
 			deleteRequestFriends(msg, i);
-		}
-		if(spamFriends1){
+		if(spamFriends1)
 			spamFriends(msg, i);
-		}
 	});
 }
 
@@ -221,33 +216,31 @@ function addFriends(msg, i){
 			console.log(allID.length);
 			var p = 0;
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
-			for( p; p < 30; p++){
-				addFriendsSleep(msg, allID[(30*(i-1))+p]);
-			}
+			for( p; p < 30; p++)
+				addFriendsSleep(allID[(30*(i-1))+p]);
 			bot.sendMessage(settings.chatID, 'Added friends: ' + p);
 			loggoutSteamClient(msg, i);
 		});
 	});
 }
 
-function addFriendsSleep(msg, line){
+function addFriendsSleep(line){
 	if(client == undefined || line == undefined)
 		return;
 	sleep(500);
 	if(line.length <= 20){
 		client.addFriend(line, function(err){
-			if(err){
-				exceptionAddFriends(msg, err);
-			}else{
+			if(err)
+				exceptionAddFriends(err);
+			else{
 				console.log('Friend added with id ', line);
-				bot.sendMessage(settings.chatID, 'Friend added with id ', line);
+				bot.sendMessage(settings.chatID, 'Friend added with id: ', line);
 			}
 		});
 	}
-
 }
 
-function exceptionAddFriends(msg, err){
+function exceptionAddFriends(err){
 	if(String(err) == 'Error: DuplicateName'){
 		console.log('Already friends or pending confirmation');
 		bot.sendMessage(settings.chatID, 'Already friends or pending confirmation');
@@ -285,22 +278,19 @@ async function spamFriends(msg, i){
 	var countReallFriends = 0;
 	var secondsWait = 0;
 	for (var key in client.myFriends) {
-		if(allFriends[key] == 3){
+		if(allFriends[key] == 3)
 			countReallFriends++;
-		}
 	}
-	if(countMess > 1){
+	if(countMess > 1)
 		secondsWait = (countReallFriends * 5) + (countMess * 3 * countReallFriends);
-	}else{
+	else
 		secondsWait = countReallFriends * 5;
-	}
 	await bot.sendMessage(settings.chatID, 'Count of friends to send a message: ' + countReallFriends);
 	await bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait '+ secondsWait + ' seconds');
 	console.log('Count of friends to send a message: ' + countReallFriends);
 	for (var key in client.myFriends) {
-		if(allFriends[key] == 3){
+		if(allFriends[key] == 3)
 			spamFriendsSleep(key, msg);
-		}
 	}
 	bot.sendMessage(msg.chat.id, '\u{2705} Sending end!');
 	countOfFriends = 0;
@@ -336,7 +326,6 @@ async function loggoutSteamClient(msg, i) {
 	if((parseInt(((allID.length/30)+1), 10)) == i && addFriends1){
 		addFriends1 = false;
 		addDeleteSpam(msg);
-	}else{
+	}else
 		connect_GoFunction_Logout(msg, i+1);
-	}
 }
