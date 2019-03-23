@@ -14,28 +14,6 @@ var config, client, configArray = {}, accountCount = settings.count, db, connect
 // Add bots option
 const addBotOptions = {username: '', password: '', sharedSecret: ''};
 
-// SQL
-if (fs.existsSync(file)) {
-	db = new sqlite3.Database(file, sqlite3.OPEN_READWRITE, function(err) {
-		if (err)
-			console.log(err.message);
-		else
-			console.log('Connected to the SteamDB database.');
-	});
-} else {
-	db = new sqlite3.Database(file);
-	console.log('SteamDB database was create.');
-	db.run('CREATE TABLE Accounts(countAcc INTEGER)', function(){
-		console.log('TABLE Accounts was create.');
-		db.run('INSERT INTO Accounts(countAcc) VALUES(?)', [0], function(err){
-			if (err)
-				console.log(err.message);
-			else
-				console.log('Insert was ended.');
-		});
-	});
-}
-
 function requireJSON(){
 	configArray = {};
 	for(var i = 1; i <= accountCount; i++){
