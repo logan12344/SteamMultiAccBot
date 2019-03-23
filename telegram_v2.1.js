@@ -1,7 +1,7 @@
 // Node modules
 const TelegramBot = require('node-telegram-bot-api'), sqlite3 = require('sqlite3').verbose(), SteamUser = require('steam-user'), 
 	SteamTotp = require('steam-totp'), settings = require('./settings.json'), SocksAgent = require('socks5-https-client/lib/Agent'),
-	fs = require('fs'), oneDay = 86400000, getSteamID64 = require('customurl2steamid64/lib/steamid64'),
+	fs = require('fs'), getSteamID64 = require('customurl2steamid64/lib/steamid64'),
 	sleep = require('system-sleep');
 
 const socksAgent = new SocksAgent({socksHost: settings.host, socksPort: settings.port, socksUsername: settings.login, socksPassword: settings.psswd}),
@@ -127,7 +127,6 @@ function onDocumentAddBot(msg){
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
 			for( p; p < allID.length; p++)
 				writeFile(allID[p], p);
-			
 		});
 	});
 }
@@ -143,7 +142,7 @@ function writeFile(line, p){
 		if (err) throw err;
 	});
 	console.log('Account added: username ' + fields[0] + 'pass ' + fields[1]);
-	bot.sendMessage(settings.chatID,'Bot with username: ' + fields[0]);
+	bot.sendMessage(msg,'Bot with username: ' + fields[0]);
 }
 
 // Steam Connections
@@ -176,9 +175,9 @@ function connectSteamClient(msg, username, pass, sharedSecret, guard, i) {
 			callback(SteamTotp.generateAuthCode(sharedSecret));
 	});
 
-	client.on('loggedOn', function() {
-		console.log('Logged into Steam ' + connect.username);
-		bot.sendMessage(settings.chatID,'\u{2705}'+ i +' Logged into Steam ' + connect.username);
+	client.on('loggedOn', async function() {
+		console.log(i +' Logged into Steam ' + connect.username);
+		await bot.sendMessage(settings.chatID,'\u{2705}'+ i +' Logged into Steam ' + connect.username);
 		if(addFriends1)
 			addFriends(msg, i);			
 		if(deleteRequestFriends1)
@@ -217,7 +216,7 @@ function addFriends(msg, i){
 			var p = 0;
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
 			for( p; p < 30; p++)
-				addFriendsSleep(allID[(30*(i-1))+p]);
+				addFriendsSleep(msg, allID[(30*(i-1))+p]);
 			bot.sendMessage(settings.chatID, 'Added friends: ' + p);
 			loggoutSteamClient(msg, i);
 		});
@@ -230,11 +229,11 @@ function addFriendsSleep(line){
 	sleep(500);
 	if(line.length <= 20){
 		client.addFriend(line, function(err){
-			if(err)
+			if(err){
 				exceptionAddFriends(err);
-			else{
+			}else{
 				console.log('Friend added with id ', line);
-				bot.sendMessage(settings.chatID, 'Friend added with id: ', line);
+				bot.sendMessage(settings.chatID, 'Friend added with id ', line);
 			}
 		});
 	}
@@ -273,25 +272,23 @@ function deleteRequestFriends(msg, k){
 }
 
 // Spam Friends
-async function spamFriends(msg, i){
+function spamFriends(msg, i){
 	var allFriends = client.myFriends;
 	var countReallFriends = 0;
 	var secondsWait = 0;
-	for (var key in client.myFriends) {
+	for (var key in client.myFriends)
 		if(allFriends[key] == 3)
 			countReallFriends++;
-	}
 	if(countMess > 1)
 		secondsWait = (countReallFriends * 5) + (countMess * 3 * countReallFriends);
 	else
 		secondsWait = countReallFriends * 5;
-	await bot.sendMessage(settings.chatID, 'Count of friends to send a message: ' + countReallFriends);
-	await bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait '+ secondsWait + ' seconds');
+	bot.sendMessage(settings.chatID, 'Count of friends to send a message: ' + countReallFriends);
+	bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait '+ secondsWait + ' seconds');
 	console.log('Count of friends to send a message: ' + countReallFriends);
-	for (var key in client.myFriends) {
+	for (var key in client.myFriends)
 		if(allFriends[key] == 3)
 			spamFriendsSleep(key, msg);
-	}
 	bot.sendMessage(msg.chat.id, '\u{2705} Sending end!');
 	countOfFriends = 0;
 	loggoutSteamClient(msg, i);
@@ -300,14 +297,14 @@ async function spamFriends(msg, i){
 function spamFriendsSleep(key, msg){
 	if(client != undefined){
 		var c = 0;
-		if(countMess > 1){
+		if(countMess > 1)
 			while (c < countMess) {
 				client.chatMessage(key, messagesForSend[c]);
 				console.log('Send to ' + key + ' mess: ' + messagesForSend[c]);
 				sleep(3000);
 				c++;
 			}
-		}else{
+		else{
 			client.chatMessage(key, messagesForSend[c]);
 			console.log('Send to ' + key + ' mess: ' + messagesForSend[c]);
 		}
