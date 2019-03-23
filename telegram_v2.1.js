@@ -1,15 +1,15 @@
 // Node modules
 const TelegramBot = require('node-telegram-bot-api'), sqlite3 = require('sqlite3').verbose(), SteamUser = require('steam-user'), 
 	SteamTotp = require('steam-totp'), settings = require('./settings.json'), SocksAgent = require('socks5-https-client/lib/Agent'),
-	fs = require('fs'), oneDay = 86400000, file = './db/SteamDB.db', getSteamID64 = require('customurl2steamid64/lib/steamid64'),
+	fs = require('fs'), oneDay = 86400000, getSteamID64 = require('customurl2steamid64/lib/steamid64'),
 	sleep = require('system-sleep');
 
 const socksAgent = new SocksAgent({socksHost: settings.host, socksPort: settings.port, socksUsername: settings.login, socksPassword: settings.psswd}),
 	bot = new TelegramBot(settings.token, {polling: true, agent: socksAgent});
 
 // Global variebles
-var config, client, configArray = {}, accountCount = settings.count, db, connect, addFriends1 = false, deleteRequestFriends1 = false,
-	spamFriends1 = false, countOfFriends = 0, countMess = 0, countOfFillArr = 0, messagesForSend = [], countAcc, allID = [];
+var config, client, configArray = {}, accountCount = settings.count, connect, addFriends1 = false, deleteRequestFriends1 = false,
+	spamFriends1 = false, countOfFriends = 0, countMess = 0, countOfFillArr = 0, messagesForSend = [], allID = [];
 
 // Add bots option
 const addBotOptions = {username: '', password: '', sharedSecret: ''};
@@ -45,7 +45,6 @@ bot.onText(/\/go/, async function(msg) { // Go
 
 bot.onText(/\/bot/, async function(msg) { // Bot
 	console.log('Enter file with usernames and pass:');
-	selectCountAcc();
 	await bot.sendMessage(settings.chatID, 'Enter file with usernames and pass:');
 	bot.once('document', onDocumentAddBot);
 });
@@ -128,21 +127,20 @@ function onDocumentAddBot(msg){
 			var p = 0;
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
 			for( p; p < allID.length; p++){
-				writeFile(settings.chatID, allID[p]);
+				writeFile(allID[p], p);
 			}
 		});
 	});
 }
 
-function writeFile(line){
+function writeFile(line, p){
 	var fields = line.split(':');
 	let configurate = {  
 		username: fields[0],
 		password: fields[1],
 		sharedSecret : ""
 	};
-	countAcc++;
-	fs.writeFileSync('config' + countAcc + '.json', JSON.stringify(configurate), function(err) {  
+	fs.writeFileSync('config' + (p+1) + '.json', JSON.stringify(configurate), function(err) {  
 		if (err) throw err;
 	});
 	console.log('Account added: username ' + fields[0] + 'pass ' + fields[1]);
