@@ -142,7 +142,7 @@ function writeFile(line, p){
 		if (err) throw err;
 	});
 	console.log('Account added: username ' + fields[0] + 'pass ' + fields[1]);
-	bot.sendMessage(msg,'Bot with username: ' + fields[0]);
+	bot.sendMessage(settings.chatID,'Bot with username: ' + fields[0]);
 }
 
 // Steam Connections
@@ -175,9 +175,9 @@ function connectSteamClient(msg, username, pass, sharedSecret, guard, i) {
 			callback(SteamTotp.generateAuthCode(sharedSecret));
 	});
 
-	client.on('loggedOn', async function() {
+	client.on('loggedOn', function() {
 		console.log(i +' Logged into Steam ' + connect.username);
-		await bot.sendMessage(settings.chatID,'\u{2705}'+ i +' Logged into Steam ' + connect.username);
+		bot.sendMessage(settings.chatID,'\u{2705}'+ i +' Logged into Steam ' + connect.username);
 		if(addFriends1)
 			addFriends(msg, i);			
 		if(deleteRequestFriends1)
@@ -216,7 +216,7 @@ function addFriends(msg, i){
 			var p = 0;
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
 			for( p; p < 30; p++)
-				addFriendsSleep(msg, allID[(30*(i-1))+p]);
+				addFriendsSleep(allID[(30*(i-1))+p]);
 			bot.sendMessage(settings.chatID, 'Added friends: ' + p);
 			loggoutSteamClient(msg, i);
 		});
@@ -227,16 +227,15 @@ function addFriendsSleep(line){
 	if(client == undefined || line == undefined)
 		return;
 	sleep(500);
-	if(line.length <= 20){
-		client.addFriend(line, function(err){
-			if(err){
-				exceptionAddFriends(err);
-			}else{
-				console.log('Friend added with id ', line);
-				bot.sendMessage(settings.chatID, 'Friend added with id ', line);
-			}
-		});
-	}
+	console.log(line);
+	client.addFriend(line, function(err){
+		if(err){
+			exceptionAddFriends(err);
+		}else{
+			console.log('Friend added with id ', line);
+			bot.sendMessage(settings.chatID, 'Friend added with id ', line);
+		}
+	});
 }
 
 function exceptionAddFriends(err){
