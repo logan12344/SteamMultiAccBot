@@ -24,8 +24,8 @@ function requireJSON(){
 
 // Telegram's functions
 bot.onText(/\/start/, async function(msg) { // Start
-	console.log('Use /bot to add new bots, if bots was add use /go');
-	await bot.sendMessage(settings.chatID, '\u{1F6A7} Use /bot to add new bots, if bots was add use /go');
+	console.log('Use /bot to add new bots, if bots was add use /go, help - use /help');
+	await bot.sendMessage(settings.chatID, '\u{1F6A7} Use /bot to add new bots, if bots was add use /go, help - use /help');
 	console.log(msg.chat.id);
 });
 
