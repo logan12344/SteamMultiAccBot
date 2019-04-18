@@ -30,7 +30,27 @@ bot.onText(/\/start/, async function(msg) { // Start
 });
 
 bot.onText(/\/help/, function() { // Help
-	helpFunction();
+	var keyboard = {
+        "inline_keyboard":[
+			[{
+				text: 'Добавить Стим аккаунты \u{2753}',
+				callback_data: 'addAccount'
+			}],
+			[{
+				text: 'Добавление в друзья \u{2753}',
+				callback_data: 'addToFriends'
+			}],
+			[{
+				text: 'Удалить заявки в друзья \u{2753}',
+				callback_data: 'deleteRequest'
+			}],
+			[{
+				text: 'Спам \u{2753}',
+				callback_data: 'spamFriends'
+			}]
+        ]
+    };
+	bot.sendMessage(settings.chatID,'\u{1F6A8} Select help\u{2757}', {'reply_markup': JSON.stringify(keyboard)});
 });
 
 bot.onText(/\/go/, async function() { // Go
@@ -73,24 +93,20 @@ bot.on('callback_query', async function(msg)  {
 bot.on('callback_query', function(msg)  {
 	switch (msg.data) {
 		case 'addAccount':
-			bot.sendMessage(settings.chatID, '\u{26A0} Please wait loading...');
 			console.log('Help addAccount');
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=14NQ1fcWBAHbNI15Y9i8R-x2Q0jl34SDk', {caption: 'Use /bot and drop file with steam accounts'});
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=1yo4fWL2xBpmoBU8_3HZS74hcPTTPkTok', {caption: 'Example of file (login:password)'});
 			break;
 		case 'addToFriends':
-			bot.sendMessage(settings.chatID, '\u{26A0} Please wait loading...');
 			console.log('Help addToFriends');
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=1FE8yOJKhOi-Mt0LdMmgExYneF8ZbVU7u', {caption: 'Use /go, choose "\u{1F4B0} Добавить друзей на все аккаунты" and drop file with ids'});
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=1fZooWZr4yZjRIFqUAO9msbomv3gAy018', {caption: 'Example of file'});
 			break;
 		case 'deleteRequest':
-			bot.sendMessage(settings.chatID, '\u{26A0} Please wait loading...');
 			console.log('Help deleteRequest');
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=1ChSmX9GEe59pxCm7IyGjbH1vDw6vjoM5', {caption: 'Use /go and choose "\u{26A0} Удалить отправленные заявки в друзья"'});
 			break;
 		case 'spamFriends':
-			bot.sendMessage(settings.chatID, '\u{26A0} Please wait loading...');
 			console.log('Help spamFriends');
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=10aebkhQqvt2QM2nVQZAQmwDWgASZM2YW', {caption: 'Use /go and choose "\u{1F4E8} Spam друзьям"'});
 			break;
@@ -140,30 +156,6 @@ async function addDeleteSpam() {
         ]
     };
     await bot.sendMessage(settings.chatID,'\u{231B} Select function for all accounts: ', {'reply_markup': JSON.stringify(keyboard)});
-}
-
-function helpFunction() {
-	var keyboard = {
-        "inline_keyboard":[
-			[{
-				text: 'Добавить Стим аккаунты \u{2753}',
-				callback_data: 'addAccount'
-			}],
-			[{
-				text: 'Добавление в друзья \u{2753}',
-				callback_data: 'addToFriends'
-			}],
-			[{
-				text: 'Удалить заявки в друзья \u{2753}',
-				callback_data: 'deleteRequest'
-			}],
-			[{
-				text: 'Спам \u{2753}',
-				callback_data: 'spamFriends'
-			}]
-        ]
-    };
-	bot.sendMessage(settings.chatID,'\u{1F6A8} Select help\u{2757}', {'reply_markup': JSON.stringify(keyboard)});
 }
 
 // Add Bot into JSONs
