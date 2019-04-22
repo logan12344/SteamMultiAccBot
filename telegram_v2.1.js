@@ -53,7 +53,7 @@ bot.onText(/\/help/, function() { // Help
 	bot.sendMessage(settings.chatID,'\u{1F6A8} Select help\u{2757}', {'reply_markup': JSON.stringify(keyboard)});
 });
 
-bot.onText(/\/go/, async function() { // Go
+bot.onText(/\/go/, function() { // Go
 	requireJSON();
 	if(configArray != {})
 		addDeleteSpam();
@@ -61,18 +61,18 @@ bot.onText(/\/go/, async function() { // Go
 		console.log('Use /bot');
 });
 
-bot.onText(/\/bot/, async function() { // Bot
+bot.onText(/\/bot/, function() { // Bot
 	console.log('Enter file with usernames and pass:');
-	await bot.sendMessage(settings.chatID, 'Enter file with usernames and pass:');
+	bot.sendMessage(settings.chatID, 'Enter file with usernames and pass:');
 	bot.once('document', onDocumentAddBot);
 });
 
 // Callbacks
-bot.on('callback_query', async function(msg)  {
+bot.on('callback_query', function(msg)  {
 	switch (msg.data) {
 		case 'func1':
 			addFriends1 = true;
-			await bot.sendMessage(settings.chatID, '\u{270F} Upload a file with ID64');
+			bot.sendMessage(settings.chatID, '\u{270F} Upload a file with ID64');
 			bot.once('document', temp);
 			break;
 		case 'func2':
@@ -84,7 +84,7 @@ bot.on('callback_query', async function(msg)  {
 			countMess = 0;
 			countOfFillArr = 0;
 			messagesForSend = [];
-			await bot.sendMessage(settings.chatID, '\u{270F} Сколько сообщений одному человеку? (Число)');
+			bot.sendMessage(settings.chatID, '\u{270F} Сколько сообщений одному человеку? (Число)');
 			bot.once('message', countMessages);
 			break;
 	}
@@ -138,7 +138,7 @@ async function fillTheArrayOfMessages(msg){
 }
 
 // Functions for Accounts (Callbacks)
-async function addDeleteSpam() {
+function addDeleteSpam() {
 	var keyboard = {
         "inline_keyboard": [
 			[{
@@ -155,7 +155,7 @@ async function addDeleteSpam() {
 			}]
         ]
     };
-    await bot.sendMessage(settings.chatID,'\u{231B} Select function for all accounts: ', {'reply_markup': JSON.stringify(keyboard)});
+    bot.sendMessage(settings.chatID,'\u{231B} Select function for all accounts: ', {'reply_markup': JSON.stringify(keyboard)});
 }
 
 // Add Bot into JSONs
@@ -266,18 +266,17 @@ function addFriends(msg, i){
 }
 
 function addFriendsSleep(line){
-	if(client == undefined || line == undefined)
-		return;
-	sleep(500);
-	console.log(line);
-	client.addFriend(line, function(err){
-		if(err){
-			exceptionAddFriends(err);
-		}else{
-			console.log('Friend added with id ', line);
-			bot.sendMessage(settings.chatID, 'Friend added with id ', line);
-		}
-	});
+	if(client != undefined && (line != undefined && line != null)){
+		sleep(500);
+		client.addFriend(line, function(err){
+			if(err){
+				exceptionAddFriends(err);
+			}else{
+				console.log('Friend added with id ', line);
+				bot.sendMessage(settings.chatID, 'Friend added with id ', line);
+			}
+		});
+	}
 }
 
 function exceptionAddFriends(err){
@@ -356,11 +355,11 @@ function spamFriendsSleep(key, msg){
 }
 
 // Log Out
-async function loggoutSteamClient(msg, i) {
+function loggoutSteamClient(msg, i) {
 	client.logOff();
 	client = undefined;
 	console.log('Log out from ' + connect.username);
-	await bot.sendMessage(settings.chatID, '\u{1F4BE} Log out from ' + connect.username);
+	bot.sendMessage(settings.chatID, '\u{1F4BE} Log out from ' + connect.username);
 	if((parseInt(((allID.length/30)+1), 10)) == i && addFriends1){
 		addFriends1 = false;
 		addDeleteSpam(msg);
