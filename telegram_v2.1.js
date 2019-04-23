@@ -257,7 +257,7 @@ function addFriends(msg, i){
 			var p = 0;
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
 			for( p; p < 30; p++)
-				addFriendsSleep(msg, allID[(30*(i-1))+p]);
+				addFriendsSleep(allID[(30*(i-1))+p]);
 			bot.sendMessage(settings.chatID, 'Added friends: ' + p);
 			loggoutSteamClient(msg, i);
 		});
@@ -268,16 +268,14 @@ function addFriendsSleep(line){
 	if(client == undefined || line == undefined)
 		return;
 	sleep(500);
-	if(line.length <= 20){
-		client.addFriend(line, function(err){
-			if(err){
-				exceptionAddFriends(err);
-			}else{
-				console.log('Friend added with id ', line);
-				bot.sendMessage(settings.chatID, 'Friend added with id ', line);
-			}
-		});
-	}
+	client.addFriend(line, function(err){
+		if(err){
+			exceptionAddFriends(err);
+		}else{
+			console.log('Friend added with id ', line);
+			bot.sendMessage(settings.chatID, 'Friend added with id ', line);
+		}
+	});
 }
 
 function exceptionAddFriends(err){
