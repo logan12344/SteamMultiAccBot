@@ -29,7 +29,7 @@ bot.onText(/\/start/, async function(msg) { // Start
 	console.log(msg.chat.id);
 });
 
-bot.onText(/\/help/, async function() { // Help
+bot.onText(/\/help/, async function(msg) { // Help
 	var keyboard = {
         "inline_keyboard":[
 			[{
@@ -53,10 +53,10 @@ bot.onText(/\/help/, async function() { // Help
 	bot.sendMessage(settings.chatID,'\u{1F6A8} Select help\u{2757}', {'reply_markup': JSON.stringify(keyboard)});
 });
 
-bot.onText(/\/go/, async function() { // Go
+bot.onText(/\/go/, async function(msg) { // Go
 	requireJSON();
 	if(configArray != {})
-		addDeleteSpam();
+		addDeleteSpam(msg);
 	else
 		console.log('Use /bot');
 });
@@ -120,7 +120,7 @@ async function countMessages(msg){
 		bot.once('message', fillTheArrayOfMessages);
 	}else{
 		await bot.sendMessage(settings.chatID, '\u{274C} Сообщений должно быть больше 0! Начните заново! ');
-		addDeleteSpam();
+		addDeleteSpam(msg);
 	}
 }
 
@@ -137,7 +137,7 @@ async function fillTheArrayOfMessages(msg){
 }
 
 // Functions for Accounts (Callbacks)
-async function addDeleteSpam() {
+async function addDeleteSpam(msg) {
 	var keyboard = {
         "inline_keyboard": [
 			[{
@@ -183,7 +183,7 @@ function writeFile(line, p){
 		if (err) throw err;
 	});
 	console.log('Account added: username ' + fields[0] + 'pass ' + fields[1]);
-	bot.sendMessage(msg,'Bot with username: ' + fields[0]);
+	bot.sendMessage(settings.chatID,'Bot with username: ' + fields[0]);
 }
 
 // Steam Connections
