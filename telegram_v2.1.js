@@ -24,12 +24,12 @@ function requireJSON(){
 
 // Telegram's functions
 bot.onText(/\/start/, async function(msg) { // Start
-	console.log('Use /bot to add new bots, if bots was add use /go, help - use /help');
-	await bot.sendMessage(settings.chatID, '\u{1F6A7} Use /bot to add new bots, if bots was add use /go, help - use /help');
+	console.log('Use /bot to add new bots, if bots was add use /go');
+	await bot.sendMessage(settings.chatID, '\u{1F6A7} Use /bot to add new bots, if bots was add use /go');
 	console.log(msg.chat.id);
 });
 
-bot.onText(/\/help/, function() { // Help
+bot.onText(/\/help/, async function() { // Help
 	var keyboard = {
         "inline_keyboard":[
 			[{
@@ -53,7 +53,7 @@ bot.onText(/\/help/, function() { // Help
 	bot.sendMessage(settings.chatID,'\u{1F6A8} Select help\u{2757}', {'reply_markup': JSON.stringify(keyboard)});
 });
 
-bot.onText(/\/go/, function() { // Go
+bot.onText(/\/go/, async function() { // Go
 	requireJSON();
 	if(configArray != {})
 		addDeleteSpam();
@@ -61,18 +61,18 @@ bot.onText(/\/go/, function() { // Go
 		console.log('Use /bot');
 });
 
-bot.onText(/\/bot/, function() { // Bot
+bot.onText(/\/bot/, async function(msg) { // Bot
 	console.log('Enter file with usernames and pass:');
-	bot.sendMessage(settings.chatID, 'Enter file with usernames and pass:');
+	await bot.sendMessage(settings.chatID, 'Enter file with usernames and pass:');
 	bot.once('document', onDocumentAddBot);
 });
 
 // Callbacks
-bot.on('callback_query', function(msg)  {
+bot.on('callback_query', async function(msg)  {
 	switch (msg.data) {
 		case 'func1':
 			addFriends1 = true;
-			bot.sendMessage(settings.chatID, '\u{270F} Upload a file with ID64');
+			await bot.sendMessage(settings.chatID, '\u{270F} Upload a file with ID64');
 			bot.once('document', temp);
 			break;
 		case 'func2':
@@ -84,29 +84,28 @@ bot.on('callback_query', function(msg)  {
 			countMess = 0;
 			countOfFillArr = 0;
 			messagesForSend = [];
-			bot.sendMessage(settings.chatID, '\u{270F} Сколько сообщений одному человеку? (Число)');
+			await bot.sendMessage(settings.chatID, '\u{270F} Сколько сообщений одному человеку? (Число)');
 			bot.once('message', countMessages);
 			break;
-	}
-});
-
-bot.on('callback_query', function(msg)  {
-	switch (msg.data) {
 		case 'addAccount':
+			bot.sendMessage(settings.chatID, '\u{26A0} Please wait loading...');
 			console.log('Help addAccount');
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=14NQ1fcWBAHbNI15Y9i8R-x2Q0jl34SDk', {caption: 'Use /bot and drop file with steam accounts'});
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=1yo4fWL2xBpmoBU8_3HZS74hcPTTPkTok', {caption: 'Example of file (login:password)'});
 			break;
 		case 'addToFriends':
+			bot.sendMessage(settings.chatID, '\u{26A0} Please wait loading...');
 			console.log('Help addToFriends');
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=1FE8yOJKhOi-Mt0LdMmgExYneF8ZbVU7u', {caption: 'Use /go, choose "\u{1F4B0} Добавить друзей на все аккаунты" and drop file with ids'});
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=1fZooWZr4yZjRIFqUAO9msbomv3gAy018', {caption: 'Example of file'});
 			break;
 		case 'deleteRequest':
+			bot.sendMessage(settings.chatID, '\u{26A0} Please wait loading...');
 			console.log('Help deleteRequest');
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=1ChSmX9GEe59pxCm7IyGjbH1vDw6vjoM5', {caption: 'Use /go and choose "\u{26A0} Удалить отправленные заявки в друзья"'});
 			break;
 		case 'spamFriends':
+			bot.sendMessage(settings.chatID, '\u{26A0} Please wait loading...');
 			console.log('Help spamFriends');
 			bot.sendPhoto(settings.chatID, 'https://drive.google.com/open?id=10aebkhQqvt2QM2nVQZAQmwDWgASZM2YW', {caption: 'Use /go and choose "\u{1F4E8} Spam друзьям"'});
 			break;
@@ -121,7 +120,7 @@ async function countMessages(msg){
 		bot.once('message', fillTheArrayOfMessages);
 	}else{
 		await bot.sendMessage(settings.chatID, '\u{274C} Сообщений должно быть больше 0! Начните заново! ');
-		addDeleteSpam(msg);
+		addDeleteSpam();
 	}
 }
 
@@ -138,7 +137,7 @@ async function fillTheArrayOfMessages(msg){
 }
 
 // Functions for Accounts (Callbacks)
-function addDeleteSpam() {
+async function addDeleteSpam() {
 	var keyboard = {
         "inline_keyboard": [
 			[{
@@ -155,7 +154,7 @@ function addDeleteSpam() {
 			}]
         ]
     };
-    bot.sendMessage(settings.chatID,'\u{231B} Select function for all accounts: ', {'reply_markup': JSON.stringify(keyboard)});
+    await bot.sendMessage(settings.chatID,'\u{231B} Select function for all accounts: ', {'reply_markup': JSON.stringify(keyboard)});
 }
 
 // Add Bot into JSONs
@@ -184,7 +183,7 @@ function writeFile(line, p){
 		if (err) throw err;
 	});
 	console.log('Account added: username ' + fields[0] + 'pass ' + fields[1]);
-	bot.sendMessage(settings.chatID,'Bot with username: ' + fields[0]);
+	bot.sendMessage(msg,'Bot with username: ' + fields[0]);
 }
 
 // Steam Connections
@@ -217,9 +216,9 @@ function connectSteamClient(msg, username, pass, sharedSecret, guard, i) {
 			callback(SteamTotp.generateAuthCode(sharedSecret));
 	});
 
-	client.on('loggedOn', function() {
+	client.on('loggedOn', async function() {
 		console.log(i +' Logged into Steam ' + connect.username);
-		bot.sendMessage(settings.chatID,'\u{2705}'+ i +' Logged into Steam ' + connect.username);
+		await bot.sendMessage(settings.chatID,'\u{2705}'+ i +' Logged into Steam ' + connect.username);
 		if(addFriends1)
 			addFriends(msg, i);			
 		if(deleteRequestFriends1)
@@ -258,17 +257,18 @@ function addFriends(msg, i){
 			var p = 0;
 			bot.sendMessage(settings.chatID, '\u{26A0} Loading, please wait ');
 			for( p; p < 30; p++)
-				addFriendsSleep(allID[(30*(i-1))+p]);
+				addFriendsSleep(msg, allID[(30*(i-1))+p]);
 			bot.sendMessage(settings.chatID, 'Added friends: ' + p);
-			sleep(2000);
 			loggoutSteamClient(msg, i);
 		});
 	});
 }
 
 function addFriendsSleep(line){
-	if(client != undefined && (line != undefined && line != null)){
-		sleep(500);
+	if(client == undefined || line == undefined)
+		return;
+	sleep(500);
+	if(line.length <= 20){
 		client.addFriend(line, function(err){
 			if(err){
 				exceptionAddFriends(err);
@@ -309,8 +309,7 @@ function deleteRequestFriends(msg, k){
 	}
 	console.log('Count of deleted friends: ' + i);
 	bot.sendMessage(settings.chatID,'\u{1F3AF} Count of deleted Requests to Friends: ' + i);
-	sleep(5000);
-	loggoutSteamClient(msg, k);
+	setTimeout(loggoutSteamClient, 5000, msg, k);
 }
 
 // Spam Friends
@@ -361,7 +360,7 @@ async function loggoutSteamClient(msg, i) {
 	client.logOff();
 	client = undefined;
 	console.log('Log out from ' + connect.username);
-	bot.sendMessage(settings.chatID, '\u{1F4BE} Log out from ' + connect.username);
+	await bot.sendMessage(settings.chatID, '\u{1F4BE} Log out from ' + connect.username);
 	if((parseInt(((allID.length/30)+1), 10)) == i && addFriends1){
 		addFriends1 = false;
 		addDeleteSpam(msg);
