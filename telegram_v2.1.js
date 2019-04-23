@@ -260,6 +260,7 @@ function addFriends(msg, i){
 			for( p; p < 30; p++)
 				addFriendsSleep(allID[(30*(i-1))+p]);
 			bot.sendMessage(settings.chatID, 'Added friends: ' + p);
+			sleep(2000);
 			loggoutSteamClient(msg, i);
 		});
 	});
@@ -308,7 +309,8 @@ function deleteRequestFriends(msg, k){
 	}
 	console.log('Count of deleted friends: ' + i);
 	bot.sendMessage(settings.chatID,'\u{1F3AF} Count of deleted Requests to Friends: ' + i);
-	setTimeout(loggoutSteamClient, 5000, msg, k);
+	sleep(5000);
+	loggoutSteamClient(msg, k);
 }
 
 // Spam Friends
@@ -355,7 +357,7 @@ function spamFriendsSleep(key, msg){
 }
 
 // Log Out
-function loggoutSteamClient(msg, i) {
+async function loggoutSteamClient(msg, i) {
 	client.logOff();
 	client = undefined;
 	console.log('Log out from ' + connect.username);
