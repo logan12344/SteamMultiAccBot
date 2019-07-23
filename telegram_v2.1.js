@@ -177,7 +177,7 @@ function writeFile(line, p){
 	let configurate = {  
 		username: fields[0],
 		password: fields[1],
-		sharedSecret : ""
+		sharedSecret : fields[2]
 	};
 	fs.writeFileSync('config' + (p+1) + '.json', JSON.stringify(configurate), function(err) {  
 		if (err) throw err;
